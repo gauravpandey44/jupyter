@@ -1,15 +1,15 @@
 
 FROM debian
-RUN apt-get -y update && \
-#apt-get -y install python2.7 && \
-#apt-get -y install python-pip && \
-apt-get -y install python3 && \
-apt-get -y install python3-pip
+RUN apt-get -y update 
 
+FROM python:3.7
+COPY requirements.txt /tmp
+WORKDIR /tmp
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-RUN python3 -m pip install --upgrade pip && \
-python3 -m pip install jupyter && \
-mkdir /opt/notebook
+RUN python3.7 -m pip install jupyter && \
+    mkdir /opt/notebook
 
 # cleanup
 RUN apt-get -qy autoremove
