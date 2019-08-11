@@ -72,18 +72,35 @@ Run rm /usr/local/bin/python && ln -s /usr/local/bin/python3 /usr/local/bin/pyth
 RUN apt-get -qy autoremove
 #######################################################################################
 #Installing Jupyter notebook
+
+# Create joyyan  user with UID=1000 and in the 'users' group
+ENV NB_USER jovyan
+ENV NB_UID 1000
+
+RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER 
+
 RUN python3 -m pip install jupyter && \
-    mkdir /opt/notebook
+    mkdir /home/$NB_USER/notebook && \
+    chown -R $NB_USER /home/$NB_USER/notebook && \
+    chmod -R 755 /home/$NB_USER/notebook
+	
 
 #######################################################################################
 #Installing python2 kernel in Jupyter notebook
+
 RUN python2 -m pip install ipykernel 
 RUN python2 -m ipykernel install --user
 
 #######################################################################################
 #Starting up Jupyter Notebook 
-RUN nohup jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/opt/notebook --allow-root >/dev/null 2>&1 &
+#RUN nohup jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/opt/notebook --allow-root >/dev/null 2>&1 &
 
 #######################################################################################
 
+#Installing ps command in docker
+USER root
+RUN apt-get -y install procps
 
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER jovyan
